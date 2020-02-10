@@ -1,18 +1,20 @@
-///! Simple SQL code generator. May be used with pooled Sqlite3 connection.
-///!
-///! Examples:
-///!
-///! ```
-///! use crate::Sqlite3Builder;
-///!
-///! let sql = Sqlite3Builder::select_from("COMPANY")
-///!     .field("id")
-///!     .field("name")
-///!     .and_where("SALARY > 25000")
-///!     .sql();
-///!
-///! assert_eq!(Some("SELECT id, name FROM COMPANY WHERE SALARY > 25000;"), sql.as_ref());
-///! ```
+//! Simple SQL code generator. May be used with pooled Sqlite3 connection.
+//!
+//! Examples:
+//!
+//! ```
+//! extern crate sqlite3builder;
+//!
+//! use sqlite3builder::Sqlite3Builder;
+//!
+//! let sql = Sqlite3Builder::select_from("COMPANY")
+//!     .field("id")
+//!     .field("name")
+//!     .and_where("SALARY > 25000")
+//!     .sql();
+//!
+//! assert_eq!(Some("SELECT id, name FROM COMPANY WHERE SALARY > 25000;"), sql.as_ref());
+//! ```
 
 #[macro_use]
 extern crate log;
@@ -74,7 +76,9 @@ impl Sqlite3Builder {
     /// You may specify comma separted list of tables.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
@@ -95,7 +99,9 @@ impl Sqlite3Builder {
     /// Create INSERT request.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::insert_into("books")
     ///     .field("title")
@@ -117,7 +123,9 @@ impl Sqlite3Builder {
     /// Create UPDATE request.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::update_table("books")
     ///     .set("price", "price + 10")
@@ -136,7 +144,9 @@ impl Sqlite3Builder {
     /// Create DELETE request.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::delete_from("books")
     ///     .and_where("price > 100")
@@ -155,7 +165,9 @@ impl Sqlite3Builder {
     /// Join with table.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::select_from("books AS b")
     ///     .field("b.title")
@@ -192,7 +204,9 @@ impl Sqlite3Builder {
     /// Set DISTINCT for fields.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .distinct()
@@ -209,7 +223,9 @@ impl Sqlite3Builder {
     /// Add fields.
     ///
     /// ```
-    /// use crate::Sqlite3Builder;
+    /// extern crate sqlite3builder;
+    ///
+    /// use sqlite3builder::Sqlite3Builder;
     ///
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .fields(&["title", "price"])
