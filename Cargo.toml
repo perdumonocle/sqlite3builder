@@ -1,0 +1,12 @@
+[package]
+name = "sqlite3builder"
+version = "0.1.0"
+authors = ["Захаров Константин Иванович <zaharov@prosoftsystems.ru>"]
+edition = "2018"
+
+[dependencies]
+log = "0.4"
+r2d2 = "0.8.8"
+r2d2-sqlite3 = "0.1.1"
+serde_json = "1.0"
+sqlite3 = "0.24.0"
