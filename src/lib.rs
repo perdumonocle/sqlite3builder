@@ -13,7 +13,7 @@
 //!     .and_where("SALARY > 25000")
 //!     .sql();
 //!
-//! assert_eq!(Some("SELECT id, name FROM COMPANY WHERE SALARY > 25000;"), sql.as_ref());
+//! assert_eq!(Ok("SELECT id, name FROM COMPANY WHERE SALARY > 25000;"), sql.as_ref());
 //! ```
 
 #[macro_use]
@@ -87,7 +87,7 @@ impl Sqlite3Builder {
     ///     .and_where("title LIKE 'Harry Potter%'")
     ///     .sql();
     ///
-    /// assert_eq!(Some("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');"), &sql.as_ref());
+    /// assert_eq!(Ok("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');"), &sql.as_ref());
     /// ```
     pub fn select_from(table: &str) -> Self {
         Self {
@@ -110,7 +110,7 @@ impl Sqlite3Builder {
     ///     .values(&["'Don Quixote', 200"])
     ///     .sql();
     ///
-    /// assert_eq!(Some("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);"), &sql.as_ref());
+    /// assert_eq!(Ok("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);"), &sql.as_ref());
     /// ```
     pub fn insert_into(table: &str) -> Self {
         Self {
@@ -131,7 +131,7 @@ impl Sqlite3Builder {
     ///     .set("price", "price + 10")
     ///     .sql();
     ///
-    /// assert_eq!(Some("UPDATE books SET price = price + 10;"), &sql.as_ref());
+    /// assert_eq!(Ok("UPDATE books SET price = price + 10;"), &sql.as_ref());
     /// ```
     pub fn update_table(table: &str) -> Self {
         Self {
@@ -152,7 +152,7 @@ impl Sqlite3Builder {
     ///     .and_where("price > 100")
     ///     .sql();
     ///
-    /// assert_eq!(Some("DELETE FROM books WHERE price > 100;"), &sql.as_ref());
+    /// assert_eq!(Ok("DELETE FROM books WHERE price > 100;"), &sql.as_ref());
     /// ```
     pub fn delete_from(table: &str) -> Self {
         Self {
@@ -175,7 +175,7 @@ impl Sqlite3Builder {
     ///     .join("shops AS s", Some("LEFT OUTER"), Some("ON b.id = s.book"))
     ///     .sql();
     ///
-    /// assert_eq!(Some("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"), &sql.as_ref());
+    /// assert_eq!(Ok("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"), &sql.as_ref());
     /// ```
     pub fn join(
         &mut self,
@@ -213,7 +213,7 @@ impl Sqlite3Builder {
     ///     .field("price")
     ///     .sql();
     ///
-    /// assert_eq!(Some("SELECT DISTINCT price FROM books;"), &sql.as_ref());
+    /// assert_eq!(Ok("SELECT DISTINCT price FROM books;"), &sql.as_ref());
     /// ```
     pub fn distinct(&mut self) -> &mut Self {
         self.distinct = true;
@@ -231,7 +231,7 @@ impl Sqlite3Builder {
     ///     .fields(&["title", "price"])
     ///     .sql();
     ///
-    /// assert_eq!(Some("SELECT title, price FROM books;"), &sql.as_ref());
+    /// assert_eq!(Ok("SELECT title, price FROM books;"), &sql.as_ref());
     /// ```
     pub fn fields(&mut self, fields: &[&str]) -> &mut Self {
         let mut fields = fields
