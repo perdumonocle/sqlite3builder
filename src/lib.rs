@@ -1,19 +1,23 @@
 //! Simple SQL code generator. May be used with pooled Sqlite3 connection.
 //!
-//! Examples:
+//! # Examples:
 //!
 //! ```
 //! extern crate sqlite3builder;
 //!
+//! # use std::error::Error;
 //! use sqlite3builder::Sqlite3Builder;
 //!
+//! # fn main() -> Result<(), Box<dyn Error>> {
 //! let sql = Sqlite3Builder::select_from("COMPANY")
 //!     .field("id")
 //!     .field("name")
 //!     .and_where("SALARY > 25000")
-//!     .sql();
+//!     .sql()?;
 //!
-//! assert_eq!(Ok("SELECT id, name FROM COMPANY WHERE SALARY > 25000;"), sql.as_ref());
+//! assert_eq!("SELECT id, name FROM COMPANY WHERE SALARY > 25000;", &sql);
+//! # Ok(())
+//! # }
 //! ```
 
 #[macro_use]
@@ -78,16 +82,20 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
     ///     .and_where("price > 100")
     ///     .and_where("title LIKE 'Harry Potter%'")
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');"), &sql.as_ref());
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn select_from(table: &str) -> Self {
         Self {
@@ -101,16 +109,20 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
-    /// use sqlite3builder::Sqlite3Builder;
+    /// # use std::error::Error;
+    /// use sqlite3builder::{Sqlite3Builder, quote};
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
     ///     .values(&[&quote("In Search of Lost Time"), "150"])
     ///     .values(&["'Don Quixote', 200"])
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);"), &sql.as_ref());
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn insert_into(table: &str) -> Self {
         Self {
@@ -125,13 +137,17 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::update_table("books")
     ///     .set("price", "price + 10")
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("UPDATE books SET price = price + 10;"), &sql.as_ref());
+    /// assert_eq!("UPDATE books SET price = price + 10;", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn update_table(table: &str) -> Self {
         Self {
@@ -146,13 +162,17 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::delete_from("books")
     ///     .and_where("price > 100")
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("DELETE FROM books WHERE price > 100;"), &sql.as_ref());
+    /// assert_eq!("DELETE FROM books WHERE price > 100;", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn delete_from(table: &str) -> Self {
         Self {
@@ -167,15 +187,19 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::select_from("books AS b")
     ///     .field("b.title")
     ///     .field("s.total")
     ///     .join("shops AS s", Some("LEFT OUTER"), Some("ON b.id = s.book"))
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"), &sql.as_ref());
+    /// assert_eq!("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn join(
         &mut self,
@@ -206,14 +230,18 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .distinct()
     ///     .field("price")
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("SELECT DISTINCT price FROM books;"), &sql.as_ref());
+    /// assert_eq!("SELECT DISTINCT price FROM books;", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn distinct(&mut self) -> &mut Self {
         self.distinct = true;
@@ -225,13 +253,17 @@ impl Sqlite3Builder {
     /// ```
     /// extern crate sqlite3builder;
     ///
+    /// # use std::error::Error;
     /// use sqlite3builder::Sqlite3Builder;
     ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .fields(&["title", "price"])
-    ///     .sql();
+    ///     .sql()?;
     ///
-    /// assert_eq!(Ok("SELECT title, price FROM books;"), &sql.as_ref());
+    /// assert_eq!("SELECT title, price FROM books;", &sql);
+    /// # Ok(())
+    /// # }
     /// ```
     pub fn fields(&mut self, fields: &[&str]) -> &mut Self {
         let mut fields = fields
