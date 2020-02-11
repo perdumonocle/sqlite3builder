@@ -1,0 +1,19 @@
+language: rust
+rust:
+  - stable
+
+before_script:
+  - rustup component add clippy
+  - rustup component add rustfmt
+
+sudo: false
+script:
+  - cargo clippy -- -D warnings
+  - cargo fmt --all -- --check
+  - cargo test --all
+  - cargo doc
+  - cargo build
+
+notifications:
+  email:
+    on_success: never
