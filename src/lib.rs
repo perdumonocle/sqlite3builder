@@ -24,8 +24,8 @@
 extern crate log;
 extern crate sql_builder;
 
-use sql_builder::{SqlBuilder, esc as SqlBuilderEsc, quote as SqlBuilderQuote};
 use serde_json::value::Value as JValue;
+use sql_builder::{esc as SqlBuilderEsc, quote as SqlBuilderQuote, SqlBuilder};
 use sqlite3::Cursor;
 use sqlite3::Value as SValue;
 use std::error::Error;
@@ -39,7 +39,6 @@ pub struct Sqlite3Builder {
 }
 
 impl Sqlite3Builder {
-
     /// Create SELECT query.
     /// You may specify comma separted list of tables.
     ///

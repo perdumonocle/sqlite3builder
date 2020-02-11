@@ -1,6 +1,6 @@
 [package]
 name = "sqlite3builder"
-version = "0.1.3"
+version = "0.1.4"
 description = "Simple SQL code generator for Sqlite3."
 authors = ["perdumonocle <konstantin_1987@mail.ru>"]
 license = "MIT"
