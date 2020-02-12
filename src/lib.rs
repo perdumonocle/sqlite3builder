@@ -66,6 +66,28 @@ impl Sqlite3Builder {
         }
     }
 
+    /// Create SELECT query without a table.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::{Sqlite3Builder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = Sqlite3Builder::select_values(&["10", &quote("100")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT 10, '100';", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn select_values(values: &[&str]) -> Self {
+        Self {
+            builder: SqlBuilder::select_values(values),
+        }
+    }
+
     /// Create INSERT query.
     ///
     /// ```
@@ -808,6 +830,26 @@ impl Sqlite3Builder {
         self.builder.query()
     }
 
+    /// SQL command generator for query or subquery without a table.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::{Sqlite3Builder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let values = Sqlite3Builder::select_values(&["10", &quote("100")])
+    ///     .query_values()?;
+    ///
+    /// assert_eq!("SELECT 10, '100'", &values);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn query_values(&self) -> Result<String, Box<dyn Error>> {
+        self.builder.query_values()
+    }
+
     /// Convert sqlite3::Value to serde_json::Value
     fn s2j(src: &SValue) -> Result<JValue, Box<dyn Error>> {
         match src {
@@ -916,6 +958,15 @@ mod tests {
         let sql = quote("Hello, 'World'");
 
         assert_eq!(&sql, "'Hello, ''World'''");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_select_only_values() -> Result<(), Box<dyn Error>> {
+        let values = Sqlite3Builder::select_values(&["10", &quote("100")]).sql()?;
+
+        assert_eq!("SELECT 10, '100';", &values);
 
         Ok(())
     }
