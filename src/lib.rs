@@ -17,7 +17,7 @@
 //! use sqlite3builder::Sqlite3Builder;
 //! ```
 //!
-//! # Examples:
+//! # Example:
 //!
 //! ```
 //! extern crate sqlite3builder;
@@ -36,6 +36,37 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ## SQL support
+//!
+//! ### Statements
+//!
+//! - SELECT
+//! - INSERT
+//! - UPDATE
+//! - DELETE
+//!
+//! ### Operations
+//!
+//! - join
+//! - distinct
+//! - group by
+//! - order by
+//! - where
+//! - limit, offset
+//! - subquery
+//! - get all results
+//! - get first row
+//! - get first value, first integer value, first string value
+//!
+//! ### Functions
+//!
+//! - escape
+//! - query
+//!
+//! ## License
+//!
+//! This project is licensed under the [MIT license](LICENSE).
 
 #[macro_use]
 extern crate log;

@@ -4,7 +4,7 @@
 [![Latest Version](https://img.shields.io/crates/v/sqlite3builder.svg)](https://crates.io/crates/sqlite3builder)
 [![Docs](https://docs.rs/sqlite3builder/badge.svg)](https://docs.rs/sqlite3builder)
 
-Simple SQL code generator.
+Simple SQL code generator. May be used with pooled Sqlite3 connection.
 
 ## Usage
 
@@ -53,6 +53,9 @@ assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
 - where
 - limit, offset
 - subquery
+- get all results
+- get first row
+- get first value, first integer value, first string value
 
 ### Functions
 
