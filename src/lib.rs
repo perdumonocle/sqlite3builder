@@ -1337,7 +1337,8 @@ mod tests {
             &sql
         );
 
-        let append = Sqlite3Builder::select_values(&["'The Great Gatsby'", "124"]).query_values()?;
+        let append =
+            Sqlite3Builder::select_values(&["'The Great Gatsby'", "124"]).query_values()?;
 
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
