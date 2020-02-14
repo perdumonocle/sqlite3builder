@@ -12,7 +12,7 @@ To use `sqlite3builder`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sqlite3builder = "0.1"
+sqlite3builder = "0.2"
 ```
 
 Next, add this to your crate:

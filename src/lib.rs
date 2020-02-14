@@ -1,5 +1,22 @@
 //! Simple SQL code generator. May be used with pooled Sqlite3 connection.
 //!
+//! ## Usage
+//!
+//! To use `sqlite3builder`, first add this to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! sqlite3builder = "0.2"
+//! ```
+//!
+//! Next, add this to your crate:
+//!
+//! ```
+//! extern crate sqlite3builder;
+//!
+//! use sqlite3builder::Sqlite3Builder;
+//! ```
+//!
 //! # Examples:
 //!
 //! ```
@@ -53,10 +70,12 @@ impl Sqlite3Builder {
     ///     .field("title")
     ///     .field("price")
     ///     .and_where("price > 100")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
+    /// // add                               ^^^^^
+    /// // here                              table
     /// # Ok(())
     /// # }
     /// ```
@@ -79,6 +98,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT 10, '100';", &sql);
+    /// // add             ^^^^^^^^^
+    /// // here             values
     /// # Ok(())
     /// # }
     /// ```
@@ -105,6 +126,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);", &sql);
+    /// // add                  ^^^^^
+    /// // here                 table
     /// # Ok(())
     /// # }
     /// ```
@@ -128,6 +151,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("UPDATE books SET price = price + 10;", &sql);
+    /// // add             ^^^^^
+    /// // here            table
     /// # Ok(())
     /// # }
     /// ```
@@ -151,6 +176,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("DELETE FROM books WHERE price > 100;", &sql);
+    /// // add                  ^^^^^
+    /// // here                 table
     /// # Ok(())
     /// # }
     /// ```
@@ -176,6 +203,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;", &sql);
+    /// // add                                              ^^^^^^^^^^      ^^^^^^^^^^ ^^^^^^^^^^^^^^^^
+    /// // here                                              operator         table       constraint
     /// # Ok(())
     /// # }
     /// ```
@@ -204,6 +233,7 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT DISTINCT price FROM books;", &sql);
+    /// // add here        ^^^^^^^^
     /// # Ok(())
     /// # }
     /// ```
@@ -226,6 +256,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books;", &sql);
+    /// // add             ^^^^^^^^^^^^
+    /// // here               fields
     /// # Ok(())
     /// # }
     /// ```
@@ -304,6 +336,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books;", &sql);
+    /// // add             ^^^^^  ^^^^^
+    /// // here            field  field
     /// # Ok(())
     /// # }
     /// ```
@@ -383,6 +417,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("UPDATE books SET price = price + 10;", &sql);
+    /// // add                       ^^^^^   ^^^^^^^^^^
+    /// // here                      field     value
     /// # Ok(())
     /// # }
     /// ```
@@ -408,6 +444,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);", &sql);
+    /// // add                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    ^^^^^^^^^^^^^^^^^^
+    /// // here                                                         values                      values
     /// # Ok(())
     /// # }
     /// ```
@@ -439,6 +477,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
+    /// // add                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                            query
     /// # Ok(())
     /// # }
     /// ```
@@ -464,6 +504,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price, COUNT(price) AS cnt FROM books GROUP BY price ORDER BY cnt DESC;", &sql);
+    /// // add                                                            ^^^^^
+    /// // here                                                           field
     /// # Ok(())
     /// # }
     /// ```
@@ -490,6 +532,8 @@ impl Sqlite3Builder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price, COUNT(price) AS cnt FROM books GROUP BY price HAVING price > 100 ORDER BY cnt DESC;", &sql);
+    /// // add                                                                         ^^^^^^^^^^^
+    /// // here                                                                           cond
     /// # Ok(())
     /// # }
     /// ```
@@ -514,10 +558,9 @@ impl Sqlite3Builder {
     ///     .and_where("title LIKE 'Harry Potter%'")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
+    /// // add                                            ^^^^^^^^^^^       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                              cond                      cond
     /// # Ok(())
     /// # }
     /// ```
@@ -540,10 +583,9 @@ impl Sqlite3Builder {
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone';",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone';", &sql);
+    /// // add                                    ^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                   field                      value
     /// # Ok(())
     /// # }
     /// ```
@@ -566,15 +608,182 @@ impl Sqlite3Builder {
     ///     .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';", &sql);
+    /// // add                                    ^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                   field                       value
     /// # Ok(())
     /// # }
     /// ```
     pub fn and_where_ne(&mut self, field: &str, value: &str) -> &mut Self {
         self.builder.and_where_ne(field, value);
+        self
+    }
+
+    /// Add WHERE LIKE condition.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_like("title", "%Philosopher's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^       ^^^^^^^^^^^^^^^^
+    /// // here                                   field             mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        self.builder.and_where_like(field, mask);
+        self
+    }
+
+    /// Add WHERE NOT LIKE condition.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_not_like("title", "%Alice's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';", &sql);
+    /// // add                                    ^^^^^           ^^^^^^^^^^
+    /// // here                                   field              mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        self.builder.and_where_not_like(field, mask);
+        self
+    }
+
+    /// Add WHERE IS NULL condition.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_is_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE price IS NULL;", &sql);
+    /// // add                                    ^^^^^
+    /// // here                                   field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_is_null(&mut self, field: &str) -> &mut Self {
+        self.builder.and_where_is_null(field);
+        self
+    }
+
+    /// Add WHERE IS NOT NULL condition.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_is_not_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE price IS NOT NULL;", &sql);
+    /// // add                                    ^^^^^
+    /// // here                                   field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_is_not_null(&mut self, field: &str) -> &mut Self {
+        self.builder.and_where_is_not_null(field);
+        self
+    }
+
+    /// Union query with subquery.
+    /// ORDER BY must be in the last subquery.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let append = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("price < 100")
+    ///     .order_asc("title")
+    ///     .query()?;
+    ///
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_like("title", "Harry Potter%")
+    ///     .order_desc("price")
+    ///     .union(&append)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;", &sql);
+    /// // add                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                                                                        query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn union(&mut self, query: &str) -> &mut Self {
+        self.builder.union(query);
+        self
+    }
+
+    /// Union query with all subquery.
+    /// ORDER BY must be in the last subquery.
+    ///
+    /// ```
+    /// extern crate sqlite3builder;
+    ///
+    /// # use std::error::Error;
+    /// use sqlite3builder::Sqlite3Builder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let append = Sqlite3Builder::select_values(&["'The Great Gatsby'", "124"])
+    ///     .query_values()?;
+    ///
+    /// let sql = Sqlite3Builder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_like("title", "Harry Potter%")
+    ///     .order_desc("price")
+    ///     .union_all(&append)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;", &sql);
+    /// // add                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                                                           query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn union_all(&mut self, query: &str) -> &mut Self {
+        self.builder.union_all(query);
         self
     }
 
@@ -590,14 +799,13 @@ impl Sqlite3Builder {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_by("price", false)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -618,14 +826,13 @@ impl Sqlite3Builder {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_asc("title")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -646,14 +853,13 @@ impl Sqlite3Builder {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -674,15 +880,14 @@ impl Sqlite3Builder {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10;", &sql);
+    /// // add                                                                                                ^^
+    /// // here                                                                                              limit
     /// # Ok(())
     /// # }
     /// ```
@@ -703,16 +908,15 @@ impl Sqlite3Builder {
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .offset(100)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10 OFFSET 100;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10 OFFSET 100;", &sql);
+    /// // add                                                                                                          ^^^
+    /// // here                                                                                                        offset
     /// # Ok(())
     /// # }
     /// ```
@@ -785,6 +989,8 @@ impl Sqlite3Builder {
     ///     .subquery_as("category")?;
     ///
     /// assert_eq!("(SELECT CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END FROM books) AS category", &cat);
+    /// // add                                                                                     ^^^^^^^^
+    /// // here                                                                                      name
     ///
     /// let sql = Sqlite3Builder::select_from("books")
     ///     .field("title")
@@ -930,12 +1136,12 @@ impl Sqlite3Builder {
     }
 }
 
-/// Escape string for SQL
+/// Escape string for SQL.
 pub fn esc(src: &str) -> String {
     SqlBuilderEsc(src)
 }
 
-/// Quote string for SQL
+/// Quote string for SQL.
 pub fn quote(src: &str) -> String {
     SqlBuilderQuote(src)
 }
@@ -1059,7 +1265,7 @@ mod tests {
             .field("title")
             .field("price")
             .and_where("price > 100")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(
@@ -1075,7 +1281,7 @@ mod tests {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_by("price", false)
             .sql()?;
 
@@ -1087,7 +1293,7 @@ mod tests {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .sql()?;
 
@@ -1099,7 +1305,7 @@ mod tests {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .order_asc("title")
             .sql()?;
@@ -1110,11 +1316,51 @@ mod tests {
     }
 
     #[test]
+    fn test_find_cheap_or_harry_potter() -> Result<(), Box<dyn Error>> {
+        let append = Sqlite3Builder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where("price < 100")
+            .order_asc("title")
+            .query()?;
+
+        let sql = Sqlite3Builder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where_like("title", "Harry Potter%")
+            .order_desc("price")
+            .union(&append)
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;",
+            &sql
+        );
+
+        let append = Sqlite3Builder::select_values(&["'The Great Gatsby'", "124"]).query_values()?;
+
+        let sql = Sqlite3Builder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where_like("title", "Harry Potter%")
+            .order_desc("price")
+            .union_all(&append)
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;",
+            &sql
+        );
+
+        Ok(())
+    }
+
+    #[test]
     fn test_select_first_3_harry_potter_books() -> Result<(), Box<dyn Error>> {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .limit(3)
             .sql()?;
@@ -1129,7 +1375,7 @@ mod tests {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .offset(2)
             .sql()?;
@@ -1139,13 +1385,47 @@ mod tests {
         let sql = Sqlite3Builder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .limit(3)
             .offset(2)
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title LIMIT 3 OFFSET 2;");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error>> {
+        let sql = Sqlite3Builder::select_from("books")
+            .field("title")
+            .and_where_not_like("title", "%Alice's%")
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';",
+            &sql
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_books_without_price() -> Result<(), Box<dyn Error>> {
+        let sql = Sqlite3Builder::select_from("books")
+            .field("title")
+            .and_where_is_null("price")
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title FROM books WHERE price IS NULL;");
+
+        let sql = Sqlite3Builder::select_from("books")
+            .field("title")
+            .and_where_is_not_null("price")
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title FROM books WHERE price IS NOT NULL;");
 
         Ok(())
     }
@@ -1222,7 +1502,7 @@ mod tests {
 
         let sql = Sqlite3Builder::update_table("books")
             .set("price", "price * 0.1")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(
@@ -1275,7 +1555,7 @@ mod tests {
         let sql = Sqlite3Builder::update_table("books")
             .set("price", "0")
             .set("title", "'[SOLD!]' || title")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(&sql, "UPDATE books SET price = 0, title = '[SOLD!]' || title WHERE title LIKE 'Harry Potter%';");
